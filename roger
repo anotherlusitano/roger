@@ -1,0 +1,212 @@
+#!/bin/sh
+#
+# ██████╗  ██████╗  ██████╗ ███████╗██████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝██╔══██╗
+# ██████╔╝██║   ██║██║  ███╗█████╗  ██████╔╝
+# ██╔══██╗██║   ██║██║   ██║██╔══╝  ██╔══██╗
+# ██║  ██║╚██████╔╝╚██████╔╝███████╗██║  ██║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝
+#
+# Author: João Ribeiro
+# Project repository: https://github.com/anotherlusitano/roger
+# License: GPL-3.0
+
+error() {
+	printf "%s\n" "$*"
+	exit 1
+}
+
+help_info() {
+    printf "
+    Usage:
+    %s [options] [theme]
+    %s [options] [dotfiles] [theme]
+
+    Options:
+      -n, --new
+        Create a new theme
+      -a, --add
+        Add dotfiles to a theme
+      -u, --use
+        Use a theme
+      -d, --delete
+        Delete a theme
+      -D, --destroy
+        Delete a theme and uninstall all the packages of that theme
+      -h, --help
+        Show this help message and exit
+    Some example usages:
+      %s -n MyCoolNordicTheme
+      %s -u MyHyprlandTheme
+      %s -a bspwm/ polybar/ sxhkd/ MyCoolNordicTheme
+      %s -d MyCoolNordicTheme
+      %s -D MyCoolNordicTheme
+    \n" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}"
+    exit 0
+}
+
+does_theme_exist() {
+  for theme in "$roger_dir"/*
+  do
+    if [ "$roger_dir/$1" == "$theme" ]; then
+      return 0
+    fi
+  done
+  error "The $1 theme does not exist!"
+}
+
+is_package_installed() {
+  pacman -Q "$1" &> /dev/null
+}
+
+install_packages() {
+  {
+      read
+      while IFS=, read -r package
+      do 
+        if ! is_package_installed $package; then
+            if sudo pacman -S "$package" --noconfirm >/dev/null; then
+                echo "$package has been installed succesfully."
+                sleep 1
+            else
+                error "$package has not been installed correctly."
+            fi
+        else
+            echo "$package is already installed on your system!"
+            sleep 1
+        fi
+      done
+  } < $1
+}
+
+uninstall_packages() {
+  {
+      read
+      while IFS=, read -r package
+      do 
+        if sudo pacman -R "$package" --noconfirm >/dev/null; then
+          echo "$package has been uninstalled succesfully."
+          sleep 1
+        else
+          error "$package has not been uninstalled correctly."
+        fi
+      done
+  } < $1
+}
+
+new_theme() {
+	theme_dir="$roger_dir/$1"
+	packages_file="$theme_dir/packages"
+
+	mkdir -p $theme_dir
+
+	while true; do
+		read -rp " Do you wish to create a packages file? [y/N]: " yn
+		case $yn in
+		[Yy]*) break ;;
+		[Nn]*) echo "$1 added successfully!" && exit 0 ;;
+		*) printf " Error: just write 'y' or 'n'\n\n" ;;
+		esac
+	done
+	echo "Insert the packages separated by new lines:" >$packages_file
+	"${EDITOR:-vi}" $packages_file
+  echo "$1 added successfully!"
+  exit 0
+}
+
+use_theme() {
+  does_theme_exist $1
+
+  theme_dir="$roger_dir/$1"
+  packages_file="$theme_dir/packages"
+
+  if [ -e $packages_file ]; then
+    install_packages $packages_file
+  fi
+
+  dotfiles=`ls -d "$theme_dir"/*/ 2>/dev/null`
+
+  for dotfile in $dotfiles
+  do
+    cp -r $dotfile $config_dir
+  done
+
+  echo "The current theme is $1"
+  exit 0
+}
+
+add_dotfile() {
+  for theme; do true; done
+  does_theme_exist $theme
+
+  for dotfile in ${@:1:$#-1}
+  do
+    cp -r $dotfile $theme
+  done
+  echo "All the dotfiles were added to the theme successfully!"
+  exit 0
+}
+
+delete_theme() {
+  does_theme_exist $1
+
+  rm -rf "$roger_dir/$1"
+  echo "$1 removed successfully!"
+  exit 0
+}
+
+destroy_theme() {
+  does_theme_exist $1
+
+  theme_dir="$roger_dir/$1"
+  packages_file="$theme_dir/packages"
+
+  if [ -e $packages_file ]; then
+    uninstall_packages $packages_file
+  fi
+
+  rm -rf $theme_dir
+  echo "$1 removed successfully!"
+  exit 0
+}
+
+# ========= MAIN =========
+roger_dir="$HOME/.roger"
+config_dir="$HOME/.config"
+
+if [ "$(id -u)" = 0 ]; then
+	error "You should not be gRoot!"
+fi
+
+case "$1" in
+-n | --new)
+	[ $# -lt 2 ] && error "Missing argument!"
+	theme_name="$2"
+	new_theme $theme_name
+	;;
+-u | --use)
+	[ $# -lt 2 ] && error "Missing argument!"
+	theme_name="$2"
+  use_theme $theme_name
+	;;
+-a | --add)
+	[ $# -lt 3 ] && error "Missing argument!"
+	add_dotfile ${@:2}
+	;;
+-d | --delete)
+	[ $# -lt 2 ] && error "Missing argument!"
+	theme_name="$2"
+	delete_theme $theme_name
+	;;
+-D | --destroy)
+	[ $# -lt 2 ] && error "Missing argument!"
+	theme_name="$2"
+	destroy_theme $theme_name
+	;;
+-h | --help)
+  help_info
+	;;
+*)
+	error "Wrong/Missing command!"
+	;;
+esac
