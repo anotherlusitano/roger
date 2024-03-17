@@ -4,7 +4,7 @@
 3. Put it in your `$PATH` and have fun :)
 
 > [!WARNING]  
-> This project just works for Arch based distributions!
+> Installing packages from a theme only works for Arch based distributions.
 
 ## Usage
 ```
