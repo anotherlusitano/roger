@@ -84,7 +84,7 @@ uninstall_packages() {
       read
       while IFS=, read -r package
       do 
-        if sudo pacman -R "$package" --noconfirm >/dev/null; then
+        if sudo pacman -Rsu "$package" --noconfirm >/dev/null; then
           echo "$package has been uninstalled succesfully."
           sleep 1
         else
