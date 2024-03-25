@@ -98,6 +98,10 @@ new_theme() {
 	theme_dir="$roger_dir/$1"
 	packages_file="$theme_dir/packages"
 
+  if [[ ! $(find "$roger_dir" -mindepth 1 -maxdepth 1 -type d -empty) ]]; then
+    echo "$1" >$current_theme
+  fi
+
 	mkdir -p $theme_dir
 
 	while true; do
@@ -131,6 +135,7 @@ use_theme() {
     cp -r $dotfile $config_dir
   done
 
+  echo "$1" >$current_theme
   echo "The current theme is $1"
   exit 0
 }
@@ -173,9 +178,14 @@ destroy_theme() {
 # ========= MAIN =========
 roger_dir="$HOME/.roger"
 config_dir="$HOME/.config"
+current_theme="$roger_dir/.theme"
 
 if [ "$(id -u)" = 0 ]; then
 	error "You should not be gRoot!"
+fi
+
+if [ -e $theme_file ]; then
+  echo "undefined" >$current_theme
 fi
 
 case "$1" in
