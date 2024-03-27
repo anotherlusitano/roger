@@ -45,6 +45,12 @@ help_info() {
     exit 0
 }
 
+show_all_themes() {
+  echo "You have this themes:"
+  echo "$(find $roger_dir -mindepth 1 -maxdepth 1 -type d -printf '%f\n')"
+  exit 0
+}
+
 reload_window_manager() {
   case "$1" in
   bspwm)
@@ -309,6 +315,9 @@ case "$1" in
   theme=$(cat $current_theme)
   echo "The current theme is $theme"
   exit 0
+	;;
+-T | --themes)
+  show_all_themes
 	;;
 -h | --help)
   help_info
