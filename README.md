@@ -23,6 +23,10 @@ Options:
     Delete a theme
   -D, --destroy
     Delete a theme and uninstall all the packages of that theme
+  -t, --theme
+    Show the current theme
+  -T, --themes
+    Show all themes available
   -h, --help
     Show this help message and exit
 
