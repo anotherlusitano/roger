@@ -305,6 +305,11 @@ case "$1" in
 	theme_name="$2"
 	destroy_theme $theme_name
 	;;
+-t | --theme)
+  theme=$(cat $current_theme)
+  echo "The current theme is $theme"
+  exit 0
+	;;
 -h | --help)
   help_info
 	;;
