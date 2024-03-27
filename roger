@@ -97,12 +97,16 @@ uninstall_packages() {
 new_theme() {
 	theme_dir="$roger_dir/$1"
 	packages_file="$theme_dir/packages"
+	wm_file="$theme_dir/.wm"
 
   if [[ ! $(find "$roger_dir" -mindepth 1 -maxdepth 1 -type d -empty) ]]; then
     echo "$1" >$current_theme
   fi
 
 	mkdir -p $theme_dir
+
+	read -rp " Add your window manager: " wm
+	echo $wm >$wm_file
 
 	while true; do
 		read -rp " Do you wish to create a packages file? [y/N]: " yn
