@@ -178,6 +178,10 @@ new_theme() {
 	packages_file="$theme_dir/packages"
 	wm_file="$theme_dir/.wm"
 
+  if [ -d "$theme_dir" ]; then
+    error "$1 already exists!"
+  fi
+
   if [[ ! $(find "$roger_dir" -mindepth 1 -maxdepth 1 -type d -empty) ]]; then
     echo "$1" >$current_theme
   fi
