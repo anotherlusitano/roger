@@ -20,13 +20,17 @@ help_info() {
     printf "
     Usage:
     %s [options] [theme]
-    %s [options] [dotfiles] [theme]
+    %s [options] [directories/files] [theme]
 
     Options:
       -n, --new
         Create a new theme
       -a, --add
-        Add dotfiles to a theme
+        Add files or directories to the config folder of a theme
+      -ah, --add-home
+        Add files or directories to the home folder of a theme
+      -ah, --add-bin
+        Add files or directories to the bin folder of a theme
       -u, --use
         Use a theme
       -d, --delete
@@ -43,9 +47,11 @@ help_info() {
       %s -n MyCoolNordicTheme
       %s -u MyHyprlandTheme
       %s -a bspwm/ polybar/ sxhkd/ MyCoolNordicTheme
+      %s -ah .bashrc MyCoolNordicTheme
+      %s -ab powermenu wifimenu MyCoolNordicTheme
       %s -d MyCoolNordicTheme
       %s -D MyCoolNordicTheme
-    \n" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}"
+    \n" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}"
     exit 0
 }
 
