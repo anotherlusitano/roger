@@ -254,6 +254,18 @@ add_dotfile() {
   exit 0
 }
 
+add_home() {
+  for theme; do true; done
+  does_theme_exist $theme
+
+  for homefile in ${@:1:$#-1}
+  do
+    cp -r $homefile "$theme/home/"
+  done
+  echo "All the home files were added to the theme successfully!"
+  exit 0
+}
+
 delete_theme() {
   does_theme_exist $1
 
@@ -304,6 +316,10 @@ case "$1" in
 -a | --add)
 	[ $# -lt 3 ] && error "Missing argument!"
 	add_dotfile ${@:2}
+	;;
+-ah | --add-home)
+	[ $# -lt 3 ] && error "Missing argument!"
+	add_home ${@:2}
 	;;
 -d | --delete)
 	[ $# -lt 2 ] && error "Missing argument!"
