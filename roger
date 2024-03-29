@@ -222,18 +222,25 @@ new_theme() {
 use_theme() {
   does_theme_exist $1
 
-  theme_dir="$roger_dir/$1/config"
+  theme_dir="$roger_dir/$1"
+  config_dir="$theme_dir/config"
+  home_dir="$theme_dir/home"
   packages_file="$theme_dir/packages"
 
   if [ -e $packages_file ]; then
     install_packages $packages_file
   fi
 
-  dotfiles=`ls -d "$theme_dir"/*/ 2>/dev/null`
+  dotfiles=`ls -d "$config_dir"/*/ 2>/dev/null`
+  homefiles=`ls -d "$home_dir"/*/ 2>/dev/null`
 
   for dotfile in $dotfiles
   do
     cp -r $dotfile $config_dir
+  done
+  for homefile in $homefiles
+  do
+    cp -r $homefile $HOME
   done
 
   reload_or_quit_wm $1
