@@ -273,6 +273,18 @@ add_home() {
   exit 0
 }
 
+add_bin() {
+  for theme; do true; done
+  does_theme_exist $theme
+
+  for bin in ${@:1:$#-1}
+  do
+    cp -r $bin "$theme/bin/"
+  done
+  echo "All the bin files were added to the theme successfully!"
+  exit 0
+}
+
 delete_theme() {
   does_theme_exist $1
 
@@ -327,6 +339,10 @@ case "$1" in
 -ah | --add-home)
 	[ $# -lt 3 ] && error "Missing argument!"
 	add_home ${@:2}
+	;;
+-ab | --add-bin)
+	[ $# -lt 3 ] && error "Missing argument!"
+	add_bin ${@:2}
 	;;
 -d | --delete)
 	[ $# -lt 2 ] && error "Missing argument!"
