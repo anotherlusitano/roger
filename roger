@@ -225,6 +225,8 @@ use_theme() {
   theme_dir="$roger_dir/$1"
   config_dir="$theme_dir/config"
   home_dir="$theme_dir/home"
+  bin_dir="$theme_dir/bin"
+  localbin_dir="$HOME/.local/bin"
   packages_file="$theme_dir/packages"
 
   if [ -e $packages_file ]; then
@@ -233,6 +235,7 @@ use_theme() {
 
   dotfiles=`ls -d "$config_dir"/*/ 2>/dev/null`
   homefiles=`ls -d "$home_dir"/*/ 2>/dev/null`
+  binfiles=`ls -d "$bin_dir"/*/ 2>/dev/null`
 
   for dotfile in $dotfiles
   do
@@ -241,6 +244,10 @@ use_theme() {
   for homefile in $homefiles
   do
     cp -r $homefile $HOME
+  done
+  for binfile in $binfiles
+  do
+    cp -r $binfile $localbin_dir
   done
 
   reload_or_quit_wm $1
