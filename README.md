@@ -10,7 +10,7 @@
 ```
 Usage:
   roger [options] [theme]
-  roger [options] [dotfiles] [theme]
+  roger [options] [directories/files] [theme]
 
 Options:
   -n, --new
