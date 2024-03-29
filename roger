@@ -222,7 +222,7 @@ new_theme() {
 use_theme() {
   does_theme_exist $1
 
-  theme_dir="$roger_dir/$1"
+  theme_dir="$roger_dir/$1/config"
   packages_file="$theme_dir/packages"
 
   if [ -e $packages_file ]; then
@@ -248,7 +248,7 @@ add_dotfile() {
 
   for dotfile in ${@:1:$#-1}
   do
-    cp -r $dotfile $theme
+    cp -r $dotfile "$theme/config/"
   done
   echo "All the dotfiles were added to the theme successfully!"
   exit 0
