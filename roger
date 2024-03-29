@@ -201,6 +201,9 @@ new_theme() {
   fi
 
 	mkdir -p $theme_dir
+	mkdir -p "$theme_dir/config"
+	mkdir -p "$theme_dir/home"
+	mkdir -p "$theme_dir/bin"
 
 	read -rp " Add your window manager: " wm
 	echo $wm >$wm_file
