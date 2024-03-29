@@ -201,6 +201,9 @@ new_theme() {
   fi
 
 	mkdir -p $theme_dir
+	mkdir -p "$theme_dir/config"
+	mkdir -p "$theme_dir/home"
+	mkdir -p "$theme_dir/bin"
 
 	read -rp " Add your window manager: " wm
 	echo $wm >$wm_file
@@ -223,17 +226,31 @@ use_theme() {
   does_theme_exist $1
 
   theme_dir="$roger_dir/$1"
+  config_dir="$theme_dir/config"
+  home_dir="$theme_dir/home"
+  bin_dir="$theme_dir/bin"
+  localbin_dir="$HOME/.local/bin"
   packages_file="$theme_dir/packages"
 
   if [ -e $packages_file ]; then
     install_packages $packages_file
   fi
 
-  dotfiles=`ls -d "$theme_dir"/*/ 2>/dev/null`
+  dotfiles=`ls -d "$config_dir"/*/ 2>/dev/null`
+  homefiles=`ls -d "$home_dir"/*/ 2>/dev/null`
+  binfiles=`ls -d "$bin_dir"/*/ 2>/dev/null`
 
   for dotfile in $dotfiles
   do
     cp -r $dotfile $config_dir
+  done
+  for homefile in $homefiles
+  do
+    cp -r $homefile $HOME
+  done
+  for binfile in $binfiles
+  do
+    cp -r $binfile $localbin_dir
   done
 
   reload_or_quit_wm $1
@@ -248,9 +265,33 @@ add_dotfile() {
 
   for dotfile in ${@:1:$#-1}
   do
-    cp -r $dotfile $theme
+    cp -r $dotfile "$theme/config/"
   done
   echo "All the dotfiles were added to the theme successfully!"
+  exit 0
+}
+
+add_home() {
+  for theme; do true; done
+  does_theme_exist $theme
+
+  for homefile in ${@:1:$#-1}
+  do
+    cp -r $homefile "$theme/home/"
+  done
+  echo "All the home files were added to the theme successfully!"
+  exit 0
+}
+
+add_bin() {
+  for theme; do true; done
+  does_theme_exist $theme
+
+  for bin in ${@:1:$#-1}
+  do
+    cp -r $bin "$theme/bin/"
+  done
+  echo "All the bin files were added to the theme successfully!"
   exit 0
 }
 
@@ -304,6 +345,14 @@ case "$1" in
 -a | --add)
 	[ $# -lt 3 ] && error "Missing argument!"
 	add_dotfile ${@:2}
+	;;
+-ah | --add-home)
+	[ $# -lt 3 ] && error "Missing argument!"
+	add_home ${@:2}
+	;;
+-ab | --add-bin)
+	[ $# -lt 3 ] && error "Missing argument!"
+	add_bin ${@:2}
 	;;
 -d | --delete)
 	[ $# -lt 2 ] && error "Missing argument!"
